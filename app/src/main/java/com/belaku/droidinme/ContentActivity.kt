@@ -3,6 +3,8 @@ package com.belaku.droidinme
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,7 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,13 +46,42 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.belaku.droidinme.ui.theme.DroidInMETheme
+import java.util.Locale
 
 
-class ContentActivity : ComponentActivity() {
+class ContentActivity : ComponentActivity(), TextToSpeech.OnInitListener {
+
+    private lateinit var desc: String
+    private var tts: TextToSpeech? = null
+
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts?.setLanguage(Locale.US) // Set your desired language
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                // Handle language not supported
+            }
+        } else {
+            // Handle initialization failure
+        }
+    }
+
+    override fun onDestroy() {
+        tts?.stop()
+        tts?.shutdown()
+        super.onDestroy()
+    }
+
+    fun speakText(text: String) {
+        tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "") // QUEUE_FLUSH or QUEUE_ADD
+    }
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        tts = TextToSpeech(this, this)
         setContent {
             DroidInMETheme {
                 Scaffold(
@@ -63,21 +96,28 @@ class ContentActivity : ComponentActivity() {
                             title = {
                                 intent.getStringExtra("day")?.let {
                                     Text(
-                                        text =  it,
+                                        text = IndexActivity.listTopics[it.subSequence(0, 1)
+                                            .toString().toInt() - 1].name,
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 2, // Restricts the text to a single line
                                         fontSize = 21.sp
                                     )
                                 }
                             },
+
+                            /*
+                            * intent.getStringExtra("day")?.let {
+                            Text(
+                                text = IndexActivity.listTopics[it.subSequence(0, 1).toString()
+                                    .toInt() - 1].desc,*/
                             actions = {
-                                IconButton(onClick = { /* Handle settings icon click */ }) {
-                                    Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                                IconButton(onClick = { speakText(desc) }) {
+                                    Icon(Icons.Filled.PlayArrow, contentDescription = "Settings")
                                 }
                             },
                             navigationIcon = {
                                 IconButton(onClick = {}) {
-                                    Icon(Icons.Filled.Home, "backIcon")
+                                    Icon(Icons.Filled.ArrowBack, "backIcon")
                                 }
                             },
 
@@ -85,10 +125,30 @@ class ContentActivity : ComponentActivity() {
                     }, modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
 
-
-
+                    Column(
+                        Modifier
+                            .verticalScroll(rememberScrollState())
+                            .padding(25.dp, 25.dp, 0.dp, 0.dp)
+                    ) {
+                        intent.getStringExtra("day")?.let {
+                            desc = IndexActivity.listTopics[it.subSequence(0, 1).toString()
+                                .toInt() - 1].desc
+                            Text(
+                                text = desc,
+                                Modifier.padding(innerPadding),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 25.sp
+                            )
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    companion object {
+        fun makeToast(s: String) {
+            Toast.makeText(appContx, s, Toast.LENGTH_SHORT).show()
         }
     }
 }
