@@ -38,13 +38,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -65,6 +68,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.belaku.droidinme.IndexActivity.Companion.isDark
+import com.belaku.droidinme.IndexActivity.Companion.topBarPrimaryColor
+import com.belaku.droidinme.IndexActivity.Companion.topBarSecondaryColor
 import com.belaku.droidinme.ui.theme.DroidInMETheme
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -116,21 +122,36 @@ class ContentActivity : ComponentActivity(), TextToSpeech.OnInitListener {
     }
 
 
+    @Composable
+    fun MyAppTheme(
+        //   darkTheme: Boolean = isSystemInDarkTheme(), // Detect system dark mode
+        content: @Composable () -> Unit
+    ) {
+        val colors = if (isDark.value) IndexActivity.DarkColorScheme else IndexActivity.LightColorScheme
+
+        MaterialTheme(
+            colorScheme = colors,
+            typography = Typography(), // Your defined typography
+            shapes = Shapes(),       // Your defined shapes
+            content = content
+        )
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         tts = TextToSpeech(this, this)
         setContent {
-            DroidInMETheme {
+            MyAppTheme {
                 Scaffold(
                     topBar = {
                         TopAppBar(
                             colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = Color.Black, // Set your desired background color here
-                                titleContentColor = Color.White,
-                                actionIconContentColor = Color.White,
-                                navigationIconContentColor = Color.White// Optional: Adjust title color for contrast
+                                containerColor = topBarPrimaryColor, // Set your desired background color here
+                                titleContentColor = topBarSecondaryColor,
+                                actionIconContentColor = topBarSecondaryColor,
+                                navigationIconContentColor = topBarSecondaryColor// Optional: Adjust title color for contrast
                             ),
                             title = {
                                 intent.getStringExtra("day")?.let {
@@ -141,24 +162,6 @@ class ContentActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                                         maxLines = 2, // Restricts the text to a single line
                                         fontSize = 21.sp
                                     )
-                                }
-                            },
-
-                            /*
-                            * intent.getStringExtra("day")?.let {
-                            Text(
-                                text = IndexActivity.listTopics[it.subSequence(0, 1).toString()
-                                    .toInt() - 1].desc,*/
-                            actions = {
-                                IconButton(onClick = {
-                                    chunkText(desc)
-                                }) {
-                                    Icon(Icons.Filled.PlayArrow, contentDescription = "Settings")
-                                }
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = {}) {
-                                    Icon(Icons.Filled.ArrowBack, "backIcon")
                                 }
                             },
 

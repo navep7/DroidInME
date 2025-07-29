@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -34,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +51,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -65,6 +69,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.belaku.droidinme.ContentActivity.Companion.makeToast
 import com.belaku.droidinme.ui.theme.DroidInMETheme
 import kotlinx.coroutines.launch
 
@@ -77,22 +82,47 @@ class IndexActivity : ComponentActivity() {
 
 
 
+    // ui.theme/Theme.kt
+    @Composable
+    fun MyAppTheme(
+     //   darkTheme: Boolean = isSystemInDarkTheme(), // Detect system dark mode
+        content: @Composable () -> Unit
+    ) {
+        isDark = remember { mutableStateOf(false) }
+        val colors = if (isDark.value) DarkColorScheme else LightColorScheme
+
+        MaterialTheme(
+            colorScheme = colors,
+            typography = Typography(), // Your defined typography
+            shapes = Shapes(),       // Your defined shapes
+            content = content
+        )
+    }
+
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        if (listTopics.size == 0)
         getTopics()
         setContent {
-            DroidInMETheme {
+
+            MyAppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                 Scaffold(
                     topBar = {
                         TopAppBar(
                             colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = Color.Black, // Set your desired background color here
-                                titleContentColor = Color.White,
-                                actionIconContentColor = Color.White,
-                                navigationIconContentColor = Color.White// Optional: Adjust title color for contrast
+                                containerColor = topBarPrimaryColor, // Set your desired background color here
+                                titleContentColor = topBarSecondaryColor,
+                                actionIconContentColor = topBarSecondaryColor,
+                                navigationIconContentColor = topBarSecondaryColor// Optional: Adjust title color for contrast
                             ),
                             title = {
                                 Text(
@@ -103,9 +133,21 @@ class IndexActivity : ComponentActivity() {
                             },
                             actions = {
                                 IconButton(onClick = {
+                                    isDark.value = !isDark.value
+                                    if (topBarPrimaryColor == Color.Black) {
+                                        topBarPrimaryColor = Color.White
+                                        topBarSecondaryColor = Color.Black
+                                    } else {
+                                        topBarPrimaryColor = Color.Black
+                                        topBarSecondaryColor = Color.White
+                                    }
 
+
+
+                                    makeToast("ModeC")
+                                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                                 }) {
-                                    Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                                    Icon(Icons.Filled.Face, contentDescription = "Settings")
                                 }
                             },
                             navigationIcon = {
@@ -126,24 +168,25 @@ class IndexActivity : ComponentActivity() {
 
                         Text(
                             text = "30 Days of..,",
-                            Modifier.padding(innerPadding).clickable {
-                            //    ContentActivity.makeToast("DarkTheme impl H3r3")
-                            //    ThemeToggleScreen()
-                            },
+                            Modifier
+                                .padding(innerPadding)
+                                .clickable {
+                                    //    ContentActivity.makeToast("DarkTheme impl H3r3")
+                                    //    ThemeToggleScreen()
+                                },
                             fontWeight = FontWeight.Bold,
                             fontSize = 25.sp
                         )
                         appContx = applicationContext
 
-                     //   RecipeReaderScreen()
                         for (i in 0 until listTopics.size)
                             Greeting(listTopics[i].name)
 
-                      //  ThemeToggleScreen()
 
                     }
 
                 }
+            }
             }
         }
     }
@@ -290,68 +333,28 @@ class IndexActivity : ComponentActivity() {
     }
 
     companion object {
-        var listTopics: ArrayList<Topic> = ArrayList()
+        var topBarSecondaryColor = Color.White
+        var topBarPrimaryColor = Color.Black
+
+        val DarkColorScheme = darkColorScheme(
+            primary = Color(0xFFBB86FC),
+            onPrimary = Color.Black,
+            surface = Color(0xFF121212),
+            onSurface = Color.White,
+            // Define other colors for dark theme
+        )
+
+        val LightColorScheme = lightColorScheme(
+            primary = Color(0xFF6200EE),
+            onPrimary = Color.White,
+            surface = Color.White,
+            onSurface = Color.Black,
+            // Define other colors for light theme
+        )
+        lateinit var isDark: MutableState<Boolean>
+        val listTopics: ArrayList<Topic> = ArrayList()
     }
 }
-/*
-
-@Composable
-private fun ThemeToggleScreen() {
-    isDarkThemeEnabled = remember { mutableStateOf(false) }
-
-    MyAppTheme(darkTheme = isDarkThemeEnabled.value) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Button(onClick = { isDarkThemeEnabled.value = !isDarkThemeEnabled.value }) {
-                Text(text = if (isDarkThemeEnabled.value) {
-                    "Switch to Light Mode"
-                } else {
-                    "Switch to Dark Mode"
-                })
-            }
-            // Your other UI content here, which will inherit the theme
-        //    Text(text = "Hello Compose!", style = MaterialTheme.typography.headlineLarge)
-        }
-    }
-}
-
-
-
-
-private val DarkColorPalette = darkColorScheme(
-    primary = Color.LightGray,
-    secondary = Color.DarkGray,
-    // ... define other dark colors
-)
-
-private val LightColorPalette = lightColorScheme(
-    primary = Color.DarkGray,
-    secondary = Color.LightGray,
-    // ... define other light colors
-)
-
-
-@Composable
-fun MyAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
-
-    MaterialTheme(
-        colorScheme = colors,
-        typography = Typography(),
-        shapes = Shapes(),
-        content = content
-    )
-}
-*/
-
-
 
 @Composable
 fun DottedUnderlinedText(
@@ -363,6 +366,12 @@ fun DottedUnderlinedText(
     dotLength: Dp = 25.dp,
     gapLength: Dp = 5.dp
 ) {
+  /*  Text(
+        text = text,
+
+        fontWeight = FontWeight.Bold,
+        fontSize = 25.sp
+    )*/
     Text(
         text = text, modifier = modifier.drawBehind {
             val strokeWidthPx = underlineThickness.toPx()
@@ -381,7 +390,7 @@ fun DottedUnderlinedText(
                     intervals = floatArrayOf(dotLengthPx, gapLengthPx), phase = 0f
                 )
             )
-        }, color = color, fontSize = 20.sp // Example font size
+        }, fontSize = 20.sp // Example font size
     )
 }
 
