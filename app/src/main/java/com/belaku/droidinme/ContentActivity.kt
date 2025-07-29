@@ -156,8 +156,7 @@ class ContentActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                             title = {
                                 intent.getStringExtra("day")?.let {
                                     Text(
-                                        text = IndexActivity.listTopics[it.subSequence(0, 1)
-                                            .toString().toInt() - 1].name,
+                                        text = it.subSequence(0, 3).toString(),
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 2, // Restricts the text to a single line
                                         fontSize = 21.sp
@@ -175,8 +174,7 @@ class ContentActivity : ComponentActivity(), TextToSpeech.OnInitListener {
                             .padding(25.dp, 25.dp, 0.dp, 0.dp)
                     ) {
                         intent.getStringExtra("day")?.let {
-                            desc = IndexActivity.listTopics[it.subSequence(0, 1).toString()
-                                .toInt() - 1].desc
+                            desc = it.subSequence(3, it.length).toString() + "\n\n" + IndexActivity.listTopics[it.subSequence(0, 1).toString().toInt() - 1].desc
                           /*  Text(
                                 text = desc,
                                 Modifier.padding(innerPadding),
