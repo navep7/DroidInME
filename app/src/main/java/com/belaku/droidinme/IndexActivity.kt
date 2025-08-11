@@ -209,8 +209,81 @@ class IndexActivity : ComponentActivity() {
         listTopics.add(Topic("1. Fundamentals", "Fundamentals"))
         listTopics.add(
             Topic(
-                "2. Activities, Fragments - Lifecycle",
-                "2. Activities, Fragments - Lifecycle"
+                "2. Activity - Lifecycle",
+                        " ...series of callback methods that define the various states an Activity transitions through from its creation to its destruction." +
+                        "\n\n Core Lifecycle Methods:" +
+                        "\n⦿ onCreate(): Called when the Activity is first created. This is where you perform essential one-time initialization, such as setting the layout (setContentView()), initializing views, and binding data." +
+                        "\n⦿ onStart(): The Activity becomes visible to the user but is not yet interactive. Use this to register broadcast receivers or start animations that apply when the UI is visible but not in focus." +
+                        "\n⦿ onResume(): The Activity is in the foreground, fully interactive, and ready to receive user input. This is where you typically start resource-intensive operations or UI updates that need to run only when the user is actively interacting with the Activity." +
+                        "\n⦿ onPause(): The Activity is partially obscured by another Activity (e.g., a transparent Activity, a dialog, or a new Activity appearing on top). You should save any unsaved, persistent data here and stop resource- intensive operations that don't need to run while the Activity is not in full focus." +
+                        "\n⦿ onStop(): The Activity is no longer visible to the user (e.g., the user navigated to another app or another Activity completely covers it). Release resources that are not needed while the Activity is not visible to conserve CPU and battery." +
+                        "\n⦿ onDestroy(): Called just before the Activity is destroyed. This is the final cleanup step, where you release all remaining resources and unregister listeners to prevent memory leaks." +
+                        "\n⦿ onRestart(): Called when an Activity that was previously stopped (i.e., onStop() was called) is being re-displayed to the user." +
+                        "\n\n Why is this Critical ?" +
+                        "\n⦿ Resource Management: Proper lifecycle management is paramount for efficiently managing resources. Mismanaging resources (e.g., not unregistering heavy listeners or not closing database cursors) leads to memory leaks, ANRs (Application Not Responding) errors, and poor performance, especially in large applications." +
+                        "\n⦿ User Experience (UX): A smoothly transitioning app that gracefully handles interruptions (like incoming calls, screen rotations, or switching to other apps) depends entirely on correct lifecycle implementation. Users expect an app to resume exactly where they left off." +
+                        "\n⦿ Stability & Reliability: Incorrect lifecycle handling can lead to crashes (e.g., trying to update UI after onStop()), data loss, or inconsistent states, all of which severely impact app reliability." +
+                        "\n⦿ Performance: Knowing where to perform expensive operations (e.g., network calls) and where to release resources is critical for app responsiveness and battery conservation" +
+                        "\n\n Configuration changes (screen rotation)?" +
+                        "\n When a configuration change occurs (most commonly screen rotation, but also keyboard availability, language change, etc.), the Android system, by default, destroys and then recreates the current Activity." +
+                        "\n⦿ The Activity's onPause(), onStop(), and onDestroy() methods are called. -> The Activity instance is destroyed." +
+                        "\n⦿ A new instance of the Activity is created. The new Activity instance goes through onCreate(), onStart(), and onResume()." +
+                        "\n This default behavior is designed to allow the app to automatically adapt to the new configuration (e.g., loading different layouts for landscape vs. portrait, or language- specific resources). The system ensures that all resources corresponding to the old configuration are released, and new ones are loaded." +
+                        "\n However, for a large, complex application, this default behavior can be problematic. The destruction and recreation process is expensive, causing a noticeable flicker, losing temporary UI state, and potentially leading to ANRs if data re-loading is slow" +
+                        "\n\n How do you preserve data during configuration changes?" +
+                        "\n ...several ways, each with its own use cases and trade-offs:" +
+                        "\n\n⦿ onSaveInstanceState() and onRestoreInstanceState() (via onCreate()'s Bundle):" +
+                        "\n Mechanism: onSaveInstanceState() is called before onStop() when the system might destroy the Activity. You can save primitive data types (and some Parcelable/Serializable objects) into a Bundle. This Bundle is then passed to onCreate() and onRestoreInstanceState() of the new Activity instance." +
+                        "\n Use Case: Ideal for saving small amounts of UI state (e.g., current scroll position, text in an EditText)." +
+                        "\n Limitation (Architect's Note): This is not designed for persisting large objects or complex data. The Bundle has a size limit, and serialization/deserialization on the main thread can cause performance issues. It also doesn't survive process death initiated by the system (e.g., Low Memory Killer)." +
+                        "\n\n⦿ ViewModel - most Recommended way.." +
+                        "\n ViewModels are designed to store and manage UI-related data in a lifecycle-conscious way. A ViewModel instance survives configuration changes because it's retained by the Android system across Activity recreations." +
+                        "\n\n Handling the configuration change yourself (via android:configChanges in Manifest):" +
+                        "\n⦿ By declaring android:configChanges=\"orientation|screenSize|keyboar dHidden\" in your Activity's manifest entry, you tell the system not to recreate the Activity on these specific changes. Instead, the onConfigurationChanged() callback method is invoked." +
+                        "\n Only use this for specific scenarios where you have a compelling reason to handle the configuration change manually (e.g., a game that needs to redraw graphics or a video player that seamlessly transitions).\n" +
+                        "\n Architect's Warning: avoid using this!" +
+                        "\n\n⦿ Persisting data to local storage (Database, SharedPreferences, Files):" +
+                        "\n Mechanism: Save data to a persistent storage medium (Room Database, SharedPreferences, internal/external files) before the Activity is destroyed, and reload it when needed.\n" +
+                        "\n Use Case: For non-UI-related data that needs to persist across app launches, process deaths, and configuration changes (e.g., user preferences, cached network data).\n" +
+                        "\n Architect's Insight: This is for data that needs to outlive the current Activity lifecycle. It's often used in conjunction with ViewModels, where the ViewModel interacts with a data repository that handles persistence." +
+                        "\n\n How would you handle memory leaks in Activity lifecycle callbacks?" +
+                        "\n Memory leaks are a critical concern in Android, often stemming from improper resource management in Activity lifecycle callbacks. An Activity memory leak occurs when an Activity instance (or its View hierarchy) cannot be garbage collected because another object holds a strong reference to it, even after onDestroy() has been called. This leads to increased memory consumption and eventually OutOfMemoryError." +
+                        "\n\n Common Causes of Memory Leaks in Activity Lifecycle:" +
+                        "\n⦿ Long-running background tasks: An AsyncTask, Thread, or Coroutine that holds a strong reference to the Activity's Context (or a View) and outlives the Activity.\n" +
+                        "\n⦿ Anonymous inner classes: Runnables, Handler callbacks, AsyncTasks, or custom Listeners defined as non-static inner classes implicitly hold a strong reference to their enclosing Activity.\n" +
+                        "\n⦿ Registered listeners/receivers: If you register BroadcastReceivers, EventBus subscribers, or other system listeners (e.g., LocationManager, SensorManager) in onResume() or onCreate() but forget to unregister them in onPause() or onDestroy().\n" +
+                        "\n⦿ Static references: Storing an Activity instance or its Views in a static field.\n" +
+                        "\n⦿ Drawables/Bitmaps: Holding onto large Bitmaps or Drawables (especially if they are tied to a Context).\n" +
+                        "\n⦿ WebView: WebViews are notorious for memory leaks and often require specific cleanup." +
+                        "\n\n Architectural Strategies & Solutions:" +
+                        "\n⦿  Use LifecycleObservers and LifecycleOwners: Attach lifecycle-aware components (like LiveData, ViewModel, LifecycleObservers) to automatically manage subscriptions and resource cleanup based on the Activity's lifecycle state. This is the preferred modern approach." +
+                        "\n⦿ Weak References: For Handlers or AsyncTasks, use WeakReference to the Activity's Context if you must hold a reference. This allows the garbage collector to reclaim the Activity if needed.\n" +
+                        "\n⦿ Unregister Listeners and Callbacks: Always ensure that anything registered in onCreate() or onResume() is unregistered in onDestroy() or onPause(), respectively." +
+                        "\n⦿ Clear Handler Callbacks: Remove any pending Runnables from Handlers in onStop() or onDestroy()." +
+                        "\n⦿ Static Inner Classes: For inner classes that need to outlive the Activity (e.g., AsyncTasks), declare them as static and pass a WeakReference to the Activity's context if they need to interact with the UI." +
+                        "\n⦿ ViewModel for long-running operations: Delegate long- running operations (like network requests or database operations) to a ViewModel or a separate repository layer. ViewModels survive configuration changes, and their data can be observed by the UI without leaks." +
+                        "\n⦿ Profile with Android Studio Profiler (Memory Profiler): Regularly use tools like the Android Studio Memory Profiler to detect memory leaks and analyze heap dumps. Look for Activities that are still in memory after they should have been destroyed.\n" +
+                        "\n⦿ LeakCanary: Integrate library, LeakCanary into your debug builds. It automatically detects and reports potential memory leaks in your application, providing stack traces to pinpoint the exact location of the leak." +
+                        "\n\n How do you implement proper navigation between Activities with data passing? " +
+                        "\n Proper navigation is essential for a smooth user experience. Android offers several ways to navigate between Activities and pass data, with modern approaches emphasizing robustness and simplicity." +
+                        "\n⦿ Traditional Approach: Using Intents" +
+                        "\n Mechanism: An Intent is an abstract description of an operation to be performed. To navigate to another Activity, you create an explicit Intent specifying the target Activity class and then call startActivity(intent).\n" +
+                        "\n Data Passing: Data can be passed via Intent \"extras\" using methods like putExtra() for primitive types, putStringArrayListExtra(), putSerializable(), or putParcelable()." +
+                        "\n Architect's Note: While fundamental, manually managing Intent extras for every data type can become verbose and error-prone in large apps." +
+                        "\n\n⦿ Modern Approach: Android Jetpack Navigation Component (Recommended)" +
+                        "\n Mechanism: The Navigation Component simplifies navigation by using a single Activity (Single Activity Architecture) and managing multiple Fragments within it. Navigation is defined graphically in a navigation graph, making it easier to visualize and manage complex flows." +
+                        "\n Data Passing: It uses Safe Args (a Gradle plugin) to generate simple object and builder classes for type-safe argument passing between destinations (Fragments or Activities). This eliminates runtime type-casting errors." +
+                        "\n Architect's Insight:" +
+                        "\n Single Activity Architecture: Encourages a simpler, more maintainable app structure." +
+                        "\n Type Safety: Safe Args drastically reduces bugs related to data passing." +
+                        "\n Deep Linking: Simplifies handling deep links, routing them directly to specific destinations in your navigation graph." +
+                        "\n Shared Element Transitions: Integrates well with shared element transitions for smoother UI animations." +
+                        "\n Back Stack Management: Automatically handles the navigation back stack, reducing complexity." +
+                        "\n\n⦿ Data Passing via Shared ViewModel - (for Fragments within the same Activity):" +
+                        "\n Mechanism: If you have multiple Fragments within the same Activity and need to share data between them that isn't directly part of navigation arguments, you can use a ViewModel scoped to the parent Activity." +
+                        "\n Use Case: Real-time communication between sibling Fragments (e.g., a filter Fragment updating a list Fragment)." +
+                        "\n Architect's Insight: Great for transient, interactive state sharing, but not for initial navigation arguments or persistent data that needs to survive process death without SavedStateHandle." +
+                        ""
             )
         )
         listTopics.add(
