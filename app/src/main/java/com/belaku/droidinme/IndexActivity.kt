@@ -333,13 +333,13 @@ class IndexActivity : ComponentActivity() {
                         "\n\n⦿ NavController:" +
                         "\n An object that manages navigation within a NavHost. It is responsible for swapping between destinations and managing the navigation Back Stack. You can obtain its instance using findNavController()." +
                         "\n\n⦿ Safe Args:" +
-                        "\n A Gradle plugin that generates simple classes for type-safe navigation and data passing between destinations. This prevents runtime errors and improves code readability." +
+                        "\n A Gradle plugin that generates simple classes for type-safe navigation and data passing between destinations. This prevents runtime errors and improves code readability."
 
             )
         )
         listTopics.add(
             Topic(
-                "3. Architecture Patterns \n\t\t\t\t MVC, MVP, MVVM, MVI",
+                "4. Architecture Patterns \n\t\t\t\t MVC, MVP, MVVM, MVI",
                 "Earlier 10 years back, GodActivity : simple, but devolved into a nightmare of tangled code, difficulty in testing and maintenance, and poor scalability as projects grew \n \t The need for Separation of Concerns and logical code structuring led us toward architectural patterns. The primary goal has always been for each part of the system to have a clear responsibility, act independently, and be easily testable and modifiable. This not only elevates code quality but also allows larger teams to work in parallel with minimal interference. " +
                         "\n \t These three patterns are approaches to organizing application code with the aim of separating UI from business logic, improving testability, and enhancing maintainability. " +
                         "\n\n 1. MVC " +
@@ -395,7 +395,7 @@ class IndexActivity : ComponentActivity() {
         )
         listTopics.add(
             Topic(
-                "4. Kotlin Coroutines & Concurrency",
+                "5. Kotlin Coroutines & Concurrency",
                 "Asynchronous Programming ? ..." +
                         "\nResponsive User Interface (UI) : " +
                         "\n\t All UI-related operations must execute on a specific thread known as the \"Main Thread\" or \"UI Thread.\" " +
@@ -455,42 +455,42 @@ class IndexActivity : ComponentActivity() {
         )
         listTopics.add(
             Topic(
-                "5. Kotlin Flow & Reactive Programming",
+                "6. Kotlin Flow & Reactive Programming",
                 "5. Kotlin Flow & Reactive Programming"
             )
         )
         listTopics.add(
             Topic(
-                "6. Jetpack Compose : Fundamentals ",
+                "7. Jetpack Compose : Fundamentals ",
                 "6. Jetpack Compose : Fundamentals "
             )
         )
         listTopics.add(
             Topic(
-                "7. Jetpack Components \n\t\t\t\t ViewModel, LiveData, Room",
+                "8. Jetpack Components \n\t\t\t\t ViewModel, LiveData, Room",
                 "7. Jetpack Components \n\t\t\t\t ViewModel, LiveData, Room"
             )
         )
         listTopics.add(
             Topic(
-                "8. Dependency Injection \n\t\t\t\t Dagger & Hilt",
+                "9. Dependency Injection \n\t\t\t\t Dagger & Hilt",
                 "8. Dependency Injection \n\t\t\t\t Dagger & Hilt"
             )
         )
-        listTopics.add(Topic("9. Testing Strategies", "9. Testing Strategies"))
+        listTopics.add(Topic("10. Testing Strategies", "9. Testing Strategies"))
         listTopics.add(
             Topic(
-                "10. I. Network Layer \n\t\t\t\t Retrofit, OkHttp, Security",
+                "11. I. Network Layer \n\t\t\t\t Retrofit, OkHttp, Security",
                 "10. I. Network Layer \n\t\t\t\t Retrofit, OkHttp, Security"
             )
         )
         listTopics.add(
             Topic(
-                "11. II. Network Layer \n\t\t\t\t Retrofit, OkHttp, Security",
+                "12. II. Network Layer \n\t\t\t\t Retrofit, OkHttp, Security",
                 "10. II. Network Layer \n\t\t\t\t Retrofit, OkHttp, Security"
             )
         )
-        listTopics.add(Topic("12, I. Designing a  Robust & Scalable Data layer", ""))
+        listTopics.add(Topic("13, I. Designing a  Robust & Scalable Data layer", ""))
         listTopics.add(Topic("13, II. Designing a  Robust & Scalable Data layer", ""))
     }
 
